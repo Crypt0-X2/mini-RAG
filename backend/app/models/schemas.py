@@ -4,6 +4,16 @@ from pydantic import BaseModel, Field
 
 
 # Ingest Endpoints
+class ChunkDetail(BaseModel):
+    """Detail of a single chunk with metadata"""
+    text: str = Field(..., description="Chunk text content")
+    source: str = Field(..., description="Source identifier")
+    title: Optional[str] = Field(None, description="Document title")
+    section: Optional[str] = Field(None, description="Section name")
+    position: int = Field(..., description="Chunk position in document")
+    token_count: int = Field(..., description="Number of tokens in chunk")
+
+
 class IngestRequest(BaseModel):
     """Request model for ingesting text"""
     text: str = Field(..., min_length=1, description="Text content to ingest")
@@ -29,6 +39,7 @@ class IngestResponse(BaseModel):
     message: str = Field(..., description="Status message")
     chunk_count: int = Field(..., description="Number of chunks created")
     document_id: Optional[str] = Field(None, description="Unique identifier for the document")
+    chunks: Optional[List[ChunkDetail]] = Field(None, description="Detailed chunk information")
 
 
 # Query Endpoints

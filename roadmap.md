@@ -83,12 +83,12 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
 - **Metadata**: source, title, section, position (chunk index)
 
 ### Tasks:
-- [ ] Install tiktoken for token counting
-- [ ] Implement `chunker.py` service:
+- [x] Install tiktoken for token counting
+- [x] Implement `chunker.py` service:
   - Split text into sentences
   - Group sentences into ~1000 token chunks
   - Add 120-token overlap between consecutive chunks
-- [ ] Attach metadata to each chunk:
+- [x] Attach metadata to each chunk:
   ```python
   {
     "text": "...",
@@ -99,11 +99,11 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
     "token_count": 987
   }
   ```
-- [ ] Write unit tests for chunker:
+- [x] Write unit tests for chunker:
   - Test overlap calculation
   - Test boundary conditions (very short/long text)
   - Verify metadata attachment
-- [ ] Integrate chunker into `/ingest` endpoint
+- [x] Integrate chunker into `/ingest` endpoint
 
 **Deliverables**: Working chunker with tests, metadata schema
 
