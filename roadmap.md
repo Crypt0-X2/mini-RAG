@@ -43,7 +43,7 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
 **Goal**: Set up FastAPI project with basic endpoints and environment configuration
 
 ### Tasks:
-- [ ] Initialize FastAPI project with proper structure
+- [x] Initialize FastAPI project with proper structure
   ```
   backend/
   ├── app/
@@ -55,19 +55,19 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
   ├── requirements.txt
   └── .env.example
   ```
-- [ ] Create core endpoints:
+- [x] Create core endpoints:
   - `GET /health` - Health check
   - `POST /ingest` - Accept text input and store in vector DB
   - `POST /query` - Accept query and return answer with citations
-- [ ] Set up environment variable loading (python-dotenv)
-- [ ] Create `.env.example` with required keys:
+- [x] Set up environment variable loading (python-dotenv)
+- [x] Create `.env.example` with required keys:
   - `OPENAI_API_KEY`
   - `PINECONE_API_KEY`
   - `PINECONE_ENVIRONMENT`
   - `JINA_API_KEY`
   - `GROQ_API_KEY`
-- [ ] Add Pydantic models for request/response validation
-- [ ] Test all endpoints with basic responses
+- [x] Add Pydantic models for request/response validation
+- [x] Test all endpoints with basic responses
 
 **Deliverables**: Working FastAPI app with 3 endpoints, .env.example
 
