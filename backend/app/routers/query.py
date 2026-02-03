@@ -4,12 +4,14 @@ from fastapi import APIRouter, HTTPException
 from app.models.schemas import QueryRequest, QueryResponse, Citation
 from app.services.retrieval_service import RetrievalService
 from app.services.reranker_service import RerankerService
+from app.services.llm_service import LLMService
 
 router = APIRouter(prefix="/query", tags=["query"])
 
 # Initialize services
 retrieval_service = None
 reranker_service = None
+llm_service = None
 
 
 def get_retrieval_service():
@@ -28,23 +30,31 @@ def get_reranker_service():
     return reranker_service
 
 
+def get_llm_service():
+    """Get or create LLM service instance"""
+    global llm_service
+    if llm_service is None:
+        llm_service = LLMService()
+    return llm_service
+
+
 @router.post("", response_model=QueryResponse)
 async def query_text(request: QueryRequest):
     """
     Query the vector database and generate an answer with citations.
     
-    This endpoint will:
-    1. Embed the query
-    2. Retrieve relevant chunks from Pinecone (Phase 4) ✓
+    This endpoint implements the full RAG pipeline:
+    1. Embed the query (implicit in retrieval)
+    2. Retrieve relevant chunks from Pinecone with MMR (Phase 4) ✓
     3. Rerank chunks using Jina Reranker (Phase 5) ✓
-    4. Generate answer using LLM with citations (Phase 6)
+    4. Generate answer using Groq LLM with citations (Phase 6) ✓
     
-    Phase 5: Reranking for improved relevance
+    Pipeline: Query → Retrieval (top-20) → Reranking (top-5) → LLM Answer → Citations
     """
     try:
         start_time = time.time()
         
-        # Phase 4: Retrieve relevant chunks (top-20)
+        # Phase 4: Retrieve relevant chunks (top-20 with MMR)
         retrieval = get_retrieval_service()
         retrieval_results = retrieval.retrieve(
             query=request.query,
@@ -69,30 +79,29 @@ async def query_text(request: QueryRequest):
         
         reranked_chunks = rerank_results["reranked_chunks"]
         
-        # Phase 5: Format reranked chunks as citations (mock answer for now)
+        # Phase 6: Generate answer using LLM with citations
+        llm = get_llm_service()
+        llm_results = llm.generate_answer(
+            query=request.query,
+            chunks=reranked_chunks
+        )
+        
+        # Build citations from LLM results
         citations = [
             Citation(
-                citation_number=i + 1,
-                text=chunk["text"],
-                source=chunk["metadata"].get("source"),
-                title=chunk["metadata"].get("title"),
-                position=chunk["metadata"].get("position")
+                citation_number=citation.get("citation_number"),
+                text=citation["text"],
+                source=citation["metadata"].get("source"),
+                title=citation["metadata"].get("title"),
+                position=citation["metadata"].get("position")
             )
-            for i, chunk in enumerate(reranked_chunks)
+            for citation in llm_results["citations"]
         ]
-        
-        # Phase 5: Generate mock answer with reranked citations
-        # Real LLM answering will be in Phase 6
-        mock_answer = (
-            f"Based on the top {len(reranked_chunks)} reranked chunks [1-{len(reranked_chunks)}]: "
-            f"Retrieved {len(retrieved_chunks)} chunks, reranked to {len(reranked_chunks)} for relevance. "
-            f"Phase 6 will generate a grounded answer using Groq LLM."
-        )
         
         elapsed_time = time.time() - start_time
         
         return QueryResponse(
-            answer=mock_answer,
+            answer=llm_results["answer"],
             citations=citations,
             retrieved_chunks=len(reranked_chunks),
             latency_ms=elapsed_time * 1000
@@ -104,26 +113,4 @@ async def query_text(request: QueryRequest):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to query: {str(e)}"
-        )
-                text="Mock chunk 3: Used by LLM to generate grounded response.",
-                source="mock_source",
-                title="Mock Document",
-                position=2
-            )
-        ]
-        
-        # Calculate latency
-        latency_ms = (time.time() - start_time) * 1000
-        
-        return QueryResponse(
-            answer=mock_answer,
-            citations=mock_citations[:request.top_k],
-            retrieved_chunks=min(request.top_k, 3),
-            latency_ms=round(latency_ms, 2)
-        )
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to process query: {str(e)}"
         )

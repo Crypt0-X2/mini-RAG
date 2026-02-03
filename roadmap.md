@@ -144,7 +144,7 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
 
 ---
 
-## Phase 4: Retrieval Strategy
+## Phase 4: Retrieval Strategy ✓
 **Goal**: Implement semantic search with MMR (Maximal Marginal Relevance)
 
 ### Retrieval Configuration:
@@ -153,20 +153,20 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
 - **Lambda**: 0.5 (balance relevance and diversity)
 
 ### Tasks:
-- [ ] Implement `retrieval_service.py`:
-  - Embed user query using same OpenAI model
+- [x] Implement `retrieval_service.py`:
+  - Embed user query using same Jina model
   - Retrieve top-20 chunks from Pinecone with MMR
   - Include metadata and scores in results
-- [ ] Add logging for retrieved chunks (for debugging)
-- [ ] Create helper function to format retrieved chunks
-- [ ] Test retrieval with various queries
-- [ ] Verify diversity in retrieved results
+- [x] Add logging for retrieved chunks (for debugging)
+- [x] Create helper function to format retrieved chunks
+- [x] Test retrieval with various queries
+- [x] Verify diversity in retrieved results
 
-**Deliverables**: Working retrieval service with MMR, logged outputs
+**Deliverables**: Working retrieval service with MMR, logged outputs ✓
 
 ---
 
-## Phase 5: Reranking
+## Phase 5: Reranking ✓
 **Goal**: Implement Jina Reranker to improve relevance of retrieved chunks
 
 ### Reranking Configuration:
@@ -175,21 +175,21 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
 - **Output**: Top-5 reranked chunks
 
 ### Tasks:
-- [ ] Implement `reranker_service.py`:
+- [x] Implement `reranker_service.py`:
   - Send query + retrieved chunks to Jina Reranker API
   - Parse relevance scores
   - Sort chunks by reranker score
   - Return top-5 chunks
-- [ ] Add error handling for API failures (fallback to retrieval scores)
-- [ ] Log reranker scores alongside retrieval scores
-- [ ] Compare before/after reranking results
-- [ ] Integrate reranker into query pipeline
+- [x] Add error handling for API failures (fallback to retrieval scores)
+- [x] Log reranker scores alongside retrieval scores
+- [x] Compare before/after reranking results
+- [x] Integrate reranker into query pipeline
 
-**Deliverables**: Working reranker service, top-5 selection logic
+**Deliverables**: Working reranker service, top-5 selection logic ✓
 
 ---
 
-## Phase 6: LLM Answering & Citations
+## Phase 6: LLM Answering & Citations ✓
 **Goal**: Generate grounded answers with inline citations using Groq LLM
 
 ### Citation Format:
@@ -198,11 +198,11 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
 - Example: "The capital of France is Paris [1]."
 
 ### Tasks:
-- [ ] Implement `llm_service.py`:
+- [x] Implement `llm_service.py`:
   - Construct grounded prompt with numbered sources
-  - Call Groq API (llama-3.1-70b or mixtral-8x7b)
+  - Call Groq API (llama-3.3-70b-versatile)
   - Parse response and extract answer
-- [ ] Design prompt template:
+- [x] Design prompt template:
   ```
   You are a helpful assistant. Answer the question based ONLY on the provided sources.
   Cite sources using [1], [2], etc.
@@ -215,21 +215,21 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
   Question: {query}
   Answer:
   ```
-- [ ] Implement citation extraction:
+- [x] Implement citation extraction:
   - Parse `[1]`, `[2]` from answer
   - Map to chunk metadata
   - Return citations with source info
-- [ ] Handle no-answer cases:
+- [x] Handle no-answer cases:
   - If LLM cannot answer from sources, return polite message
   - Example: "I cannot find a direct answer in the provided context."
-- [ ] Update `/query` endpoint:
+- [x] Update `/query` endpoint:
   - Accept query
   - Retrieve chunks
   - Rerank chunks
   - Generate answer with citations
   - Return answer + citations + source snippets
 
-**Deliverables**: Complete query pipeline with LLM answering and citations
+**Deliverables**: Complete query pipeline with LLM answering and citations ✓
 
 ---
 
@@ -361,17 +361,17 @@ User Input → FastAPI Backend
             ↓
     Chunking (1000 tokens, 12% overlap)
             ↓
-    OpenAI Embeddings (text-embedding-3-small)
+    Jina Embeddings (jina-embeddings-v3, 1024 dims)
             ↓
     Pinecone Vector DB (upsert)
 
 User Query → FastAPI Backend
             ↓
-    OpenAI Embeddings (same model)
+    Jina Embeddings (same model)
             ↓
     Pinecone Retrieval (MMR, top-20)
             ↓
-    Jina Reranker (top-5)
+    Jina Reranker v2 (top-5)
             ↓
     Groq LLM (grounded prompt)
             ↓
