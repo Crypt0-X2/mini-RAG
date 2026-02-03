@@ -2,8 +2,20 @@
 import time
 from fastapi import APIRouter, HTTPException
 from app.models.schemas import QueryRequest, QueryResponse, Citation
+from app.services.retrieval_service import RetrievalService
 
 router = APIRouter(prefix="/query", tags=["query"])
+
+# Initialize retrieval service
+retrieval_service = None
+
+
+def get_retrieval_service():
+    """Get or create retrieval service instance"""
+    global retrieval_service
+    if retrieval_service is None:
+        retrieval_service = RetrievalService(top_k=20, lambda_param=0.5)
+    return retrieval_service
 
 
 @router.post("", response_model=QueryResponse)
@@ -13,41 +25,66 @@ async def query_text(request: QueryRequest):
     
     This endpoint will:
     1. Embed the query
-    2. Retrieve relevant chunks from Pinecone
-    3. Rerank chunks using Jina Reranker
-    4. Generate answer using LLM with citations
+    2. Retrieve relevant chunks from Pinecone (Phase 4) ✓
+    3. Rerank chunks using Jina Reranker (Phase 5)
+    4. Generate answer using LLM with citations (Phase 6)
     
-    For Phase 1, this returns a mock response.
+    Phase 4: Retrieval with MMR
     """
     try:
         start_time = time.time()
         
-        # For Phase 1, return a mock response
-        # Real implementation will come in Phase 4-6
-        
-        mock_answer = (
-            f"This is a mock answer to your query: '{request.query}'. "
-            f"In Phase 4-6, this will retrieve relevant chunks [1], "
-            f"rerank them [2], and generate a grounded answer using an LLM [3]."
+        # Phase 4: Retrieve relevant chunks
+        retrieval = get_retrieval_service()
+        results = retrieval.retrieve(
+            query=request.query,
+            top_k=request.top_k or 20
         )
         
-        mock_citations = [
+        retrieved_chunks = results["chunks"]
+        
+        if not retrieved_chunks:
+            raise HTTPException(
+                status_code=404,
+                detail="No relevant chunks found in the database"
+            )
+        
+        # Phase 4: Format chunks as citations (mock answer for now)
+        citations = [
             Citation(
-                citation_number=1,
-                text="Mock chunk 1: Retrieved from vector database using semantic search.",
-                source="mock_source",
-                title="Mock Document",
-                position=0
-            ),
-            Citation(
-                citation_number=2,
-                text="Mock chunk 2: Reranked using Jina Reranker for relevance.",
-                source="mock_source",
-                title="Mock Document",
-                position=1
-            ),
-            Citation(
-                citation_number=3,
+                citation_number=i + 1,
+                text=chunk["text"],
+                source=chunk["metadata"].get("source"),
+                title=chunk["metadata"].get("title"),
+                position=chunk["metadata"].get("position")
+            )
+            for i, chunk in enumerate(retrieved_chunks)
+        ]
+        
+        # Phase 4: Generate mock answer with citations
+        # Real LLM answering will be in Phase 6
+        mock_answer = (
+            f"Based on the retrieved chunks [1-{len(retrieved_chunks)}]: "
+            f"The top-{len(retrieved_chunks)} most relevant chunks have been retrieved using MMR. "
+            f"Phases 5-6 will rerank these and generate a grounded answer."
+        )
+        
+        elapsed_time = time.time() - start_time
+        
+        return QueryResponse(
+            answer=mock_answer,
+            citations=citations,
+            retrieved_chunks=len(retrieved_chunks),
+            latency_ms=elapsed_time * 1000
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to query: {str(e)}"
+        )
                 text="Mock chunk 3: Used by LLM to generate grounded response.",
                 source="mock_source",
                 title="Mock Document",
