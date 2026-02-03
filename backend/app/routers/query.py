@@ -62,6 +62,9 @@ async def query_text(request: QueryRequest):
         )
         
         retrieved_chunks = retrieval_results["chunks"]
+        print(f"[DEBUG] Retrieved {len(retrieved_chunks)} chunks for query: '{request.query[:60]}'")
+        for i, chunk in enumerate(retrieved_chunks[:3], 1):  # Show first 3
+            print(f"[DEBUG] Chunk {i}: {chunk['text'][:100]}... (score: {chunk.get('score', 'N/A')})")
         
         if not retrieved_chunks:
             raise HTTPException(
@@ -78,6 +81,9 @@ async def query_text(request: QueryRequest):
         )
         
         reranked_chunks = rerank_results["reranked_chunks"]
+        print(f"[DEBUG] Reranked to {len(reranked_chunks)} chunks")
+        for i, chunk in enumerate(reranked_chunks, 1):
+            print(f"[DEBUG] Reranked #{i}: {chunk['text'][:100]}... (score: {chunk.get('reranker_score', 'N/A')})")
         
         # Phase 6: Generate answer using LLM with citations
         llm = get_llm_service()

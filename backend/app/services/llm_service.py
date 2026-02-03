@@ -183,14 +183,15 @@ class LLMService:
         Returns:
             Complete prompt with instructions and sources
         """
-        prompt = f"""You are a helpful AI assistant. Answer the question ONLY based on the provided sources below.
+        prompt = f"""You are a helpful AI assistant. Answer the question based on the provided sources below.
 
 IMPORTANT RULES:
-1. Only use information from the numbered sources [1], [2], etc.
-2. If the answer is not in the sources, say "I cannot find this information in the provided sources."
-3. Include citations using [1], [2], etc. directly after relevant sentences.
-4. Do NOT hallucinate or add information from your training data.
-5. Be concise and direct.
+1. Base your answer primarily on the numbered sources [1], [2], etc.
+2. Include citations using [1], [2], etc. after sentences that reference a source.
+3. Synthesize information across multiple sources when relevant.
+4. If the sources provide partial information, answer what you can and note any gaps.
+5. Only if the sources contain NO relevant information at all, say "I cannot find this information in the provided sources."
+6. Be concise, accurate, and helpful.
 
 SOURCES:
 {sources_text}

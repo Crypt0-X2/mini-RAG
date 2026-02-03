@@ -244,31 +244,31 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
 5. **Metrics Display**: Show latency and token/cost estimates
 
 ### Tasks:
-- [ ] Initialize React app (Vite + TypeScript)
-- [ ] Create layout with three sections:
+- [x] Initialize React app (Vite + TypeScript)
+- [x] Create layout with three sections:
   - Ingest panel (left/top)
   - Query panel (center)
   - Results panel (right/bottom)
-- [ ] Implement `/ingest` UI:
+- [x] Implement `/ingest` UI:
   - Text area for input
   - Optional title/source fields
   - "Ingest" button
   - Success/error feedback
-- [ ] Implement `/query` UI:
+- [x] Implement `/query` UI:
   - Query input box
   - "Ask" button
   - Loading state
-- [ ] Implement results display:
+- [x] Implement results display:
   - Answer text with highlighted citations
   - Expandable source snippets
   - Citation links to sources
-- [ ] Add metrics display:
+- [x] Add metrics display:
   - Request latency (ms)
   - Token count estimate
   - Cost estimate (rough)
-- [ ] Style with Tailwind CSS or similar
-- [ ] Add error handling and loading states
-- [ ] Make responsive for mobile
+- [x] Style with Tailwind CSS or similar
+- [x] Add error handling and loading states
+- [x] Make responsive for mobile
 
 **Deliverables**: Working React frontend with all required features
 

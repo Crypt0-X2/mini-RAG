@@ -1,7 +1,12 @@
 """FastAPI Main Application"""
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 from app.routers import ingest, query
+
+# Load environment variables from backend/.env
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 app = FastAPI(
     title="Mini RAG API",
