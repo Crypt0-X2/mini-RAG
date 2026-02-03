@@ -7,7 +7,7 @@ Build and host a small RAG (Retrieval-Augmented Generation) application that all
 - **Backend**: FastAPI
 - **Frontend**: React
 - **Vector Database**: Pinecone (cloud-hosted)
-- **Embedding Model**: OpenAI text-embedding-3-small
+- **Embedding Model**: Jina Embeddings v3 (1024 dimensions)
 - **Reranker**: Jina Reranker
 - **LLM Provider**: Groq (Llama or Mixtral)
 - **Deployment**: Render (backend) + Vercel (frontend)
@@ -61,10 +61,8 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
   - `POST /query` - Accept query and return answer with citations
 - [x] Set up environment variable loading (python-dotenv)
 - [x] Create `.env.example` with required keys:
-  - `OPENAI_API_KEY`
-  - `PINECONE_API_KEY`
-  - `PINECONE_ENVIRONMENT`
   - `JINA_API_KEY`
+  - `PINECONE_API_KEY`
   - `GROQ_API_KEY`
 - [x] Add Pydantic models for request/response validation
 - [x] Test all endpoints with basic responses
@@ -109,34 +107,40 @@ Focus on core RAG functionality. Avoid adding auth, multiple file formats, advan
 
 ---
 
-## Phase 3: Embeddings & Vector DB
+## Phase 3: Embeddings & Vector DB ✓
 **Goal**: Set up Pinecone index and implement embedding generation + storage
 
 ### Pinecone Configuration:
-- **Dimension**: 1536 (for text-embedding-3-small)
+- **Dimension**: 1024 (for Jina Embeddings v3)
 - **Metric**: cosine
 - **Index name**: `mini-rag-index`
-- **Pod type**: starter (free tier)
+- **Type**: Serverless (free tier)
+
+### Jina Configuration:
+- **Model**: jina-embeddings-v3
+- **Input type**: text
+- **Dimension**: 1024
 
 ### Tasks:
-- [ ] Create Pinecone index via dashboard or API
-- [ ] Implement `embedding_service.py`:
-  - Generate embeddings using OpenAI API
+- [x] Create Pinecone index via dashboard or API
+- [x] Implement `embedding_service.py`:
+  - Generate embeddings using Jina API
   - Batch processing for multiple chunks
   - Error handling and retry logic
-- [ ] Implement `vector_store.py`:
+- [x] Implement `vector_store.py`:
   - Upsert chunks with deterministic IDs (hash of text + metadata)
   - Store full metadata alongside vectors
-- [ ] Update `/ingest` endpoint:
+  - Filter out null metadata values
+- [x] Update `/ingest` endpoint:
   - Accept text input
   - Chunk text
   - Generate embeddings
   - Upsert to Pinecone
   - Return success confirmation with chunk count
-- [ ] Test ingestion with sample documents
-- [ ] Verify vectors in Pinecone dashboard
+- [x] Test ingestion with sample documents
+- [x] Verify vectors in Pinecone dashboard
 
-**Deliverables**: Working ingestion pipeline, Pinecone index with test data
+**Deliverables**: Working ingestion pipeline, Pinecone index with test data ✓
 
 ---
 
