@@ -61,7 +61,7 @@ const QueryPanel: React.FC<QueryPanelProps> = ({ onQueryResult }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask anything about your documents... E.g., 'What is RNN?' or 'Explain transformers'"
+            placeholder="Ask anything about your documents..."
             className="w-full px-4 py-3 border-2 border-teal-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 resize-none text-base bg-slate-950 bg-opacity-60 text-cyan-50 placeholder-teal-800 shadow-inner"
             rows={3}
             disabled={loading}

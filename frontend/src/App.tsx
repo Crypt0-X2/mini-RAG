@@ -58,15 +58,15 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="relative w-full px-6 py-8">
+      <main className="relative w-full px-6 py-8 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-180px)]">
           {/* Left Column - Ingest */}
-          <div className="h-full">
+          <div className="h-full overflow-hidden">
             <IngestPanel />
           </div>
 
           {/* Right Column - Query */}
-          <div className="h-full flex flex-col space-y-6">
+          <div className="h-full flex flex-col space-y-6 overflow-hidden">
             <QueryPanel onQueryResult={setQueryResult} />
             <div className="flex-1 overflow-hidden">
               <ResultsPanel result={queryResult} />

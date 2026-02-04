@@ -73,7 +73,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ result }) => {
       </div>
 
       <div className="mb-4">
-        <div className="bg-slate-950 bg-opacity-70 border-2 border-blue-500 rounded-xl p-5 shadow-inner">
+        <div className="bg-slate-950 bg-opacity-70 border-2 border-blue-500 rounded-xl p-5 shadow-inner max-h-96 overflow-y-auto">
           <p className="text-cyan-50 leading-relaxed whitespace-pre-wrap font-medium text-base">
             {renderAnswerWithCitations(result.answer)}
           </p>
@@ -100,11 +100,11 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({ result }) => {
       </div>
 
       {result.citations.length > 0 && (
-        <div>
+        <div className="flex-1 min-h-0">
           <h3 className="text-lg font-bold text-white mb-4">
             Sources ({result.citations.length})
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-64 overflow-y-auto pr-2">
             {result.citations.map((citation: Citation) => {
               const isExpanded = expandedCitations.has(citation.citation_number);
               return (
