@@ -105,6 +105,38 @@ Region: us-east-1
 
 ## 🚀 Quick Start
 
+### 🐳 Option 1: Docker (Recommended)
+
+The fastest way to get started! One command to run the entire stack.
+
+**Prerequisites:**
+- Docker Desktop (Windows/Mac) or Docker Engine (Linux)
+- API Keys: Jina AI, Pinecone, Groq
+
+**Steps:**
+```bash
+# 1. Clone repository
+git clone https://github.com/Crypt0-X2/mini-RAG.git
+cd mini-RAG
+
+# 2. Setup environment
+cp .env.docker .env
+# Edit .env and add your API keys
+
+# 3. Start with Docker Compose
+docker-compose up --build
+
+# Access:
+# Frontend: http://localhost:5173
+# Backend:  http://localhost:8001
+```
+
+📖 **[Complete Docker Guide →](DOCKER.md)**
+
+---
+
+### 💻 Option 2: Manual Setup
+
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+

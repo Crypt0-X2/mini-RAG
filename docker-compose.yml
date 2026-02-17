@@ -1,0 +1,70 @@
+services:
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mini-rag-backend-dev
+    ports:
+      - "8001:8001"
+    environment:
+      # API Keys - Load from .env file
+      - JINA_API_KEY=${JINA_API_KEY}
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      # Jina Configuration
+      - JINA_EMBED_MODEL=${JINA_EMBED_MODEL:-jina-embeddings-v3}
+      - JINA_EMBED_DIM=${JINA_EMBED_DIM:-1024}
+      # Pinecone Configuration
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME:-mini-rag-index}
+      - PINECONE_DIMENSION=${PINECONE_DIMENSION:-1024}
+      # Application Settings
+      - CHUNK_SIZE=${CHUNK_SIZE:-1000}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-120}
+      - RETRIEVAL_TOP_K=${RETRIEVAL_TOP_K:-20}
+      - RERANK_TOP_K=${RERANK_TOP_K:-5}
+    volumes:
+      # Mount backend code for hot reload
+      - ./backend:/app
+      # Exclude venv from mount
+      - /app/venv
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+    networks:
+      - mini-rag-network
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import requests; requests.get('http://localhost:8001/health')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: mini-rag-frontend-dev
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8001
+    volumes:
+      # Mount frontend code for hot reload
+      - ./frontend:/app
+      # Exclude node_modules from mount
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    networks:
+      - mini-rag-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5173" ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+networks:
+  mini-rag-network:
+    driver: bridge

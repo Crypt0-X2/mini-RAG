@@ -1,0 +1,85 @@
+services:
+  # Backend Service - Production
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mini-rag-backend-prod
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    environment:
+      # API Keys - Load from .env file
+      - JINA_API_KEY=${JINA_API_KEY}
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      # Jina Configuration
+      - JINA_EMBED_MODEL=${JINA_EMBED_MODEL:-jina-embeddings-v3}
+      - JINA_EMBED_DIM=${JINA_EMBED_DIM:-1024}
+      # Pinecone Configuration
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME:-mini-rag-index}
+      - PINECONE_DIMENSION=${PINECONE_DIMENSION:-1024}
+      # Application Settings
+      - CHUNK_SIZE=${CHUNK_SIZE:-1000}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-120}
+      - RETRIEVAL_TOP_K=${RETRIEVAL_TOP_K:-20}
+      - RERANK_TOP_K=${RERANK_TOP_K:-5}
+    networks:
+      - mini-rag-network
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import requests; requests.get('http://localhost:8001/health')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Frontend Service - Production
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: mini-rag-frontend-prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - mini-rag-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/" ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  mini-rag-network:
+    driver: bridge
