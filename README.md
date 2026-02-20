@@ -8,7 +8,11 @@ A Retrieval-Augmented Generation (RAG) application that allows users to ingest d
 
 ## 🌐 Live Demo
 
-**[https://mini-rag-taupe.vercel.app](https://mini-rag-taupe.vercel.app)**
+| Deployment | URL |
+|-----------|-----|
+| **Frontend (Vercel)** | [https://mini-rag-taupe.vercel.app](https://mini-rag-taupe.vercel.app) |
+| **AWS EC2 Frontend** | [http://54.147.11.100:5173](http://54.147.11.100:5173) |
+| **AWS EC2 Backend API** | [http://54.147.11.100:8001/docs](http://54.147.11.100:8001/docs) |
 
 ---
 
@@ -60,7 +64,7 @@ A Retrieval-Augmented Generation (RAG) application that allows users to ingest d
     Reranker:   Jina Reranker
     Vector DB:  Pinecone (Serverless)
     LLM:        Groq (Llama 3.3 70B Versatile)
-    Hosting:    Vercel (Frontend) + Render (Backend)
+    Hosting:    Vercel (Frontend) + Render (Backend) + AWS EC2 (Docker)
 ```
 
 ---
@@ -77,6 +81,7 @@ A Retrieval-Augmented Generation (RAG) application that allows users to ingest d
 | **Reranker** | Jina Reranker | - |
 | **LLM** | Groq (Llama 3.3 70B) | llama-3.3-70b-versatile |
 | **Hosting** | Render (Backend) + Vercel (Frontend) | Free tier |
+| **Cloud Deploy** | AWS EC2 (t3.micro) + Docker | `54.147.11.100` |
 
 ---
 
@@ -279,6 +284,38 @@ See [evaluation.md](evaluation.md) for detailed results.
 ---
 
 ## 🚢 Deployment
+
+### ☁️ AWS EC2 (Docker) — Current Production
+
+**Instance Details:**
+```
+Instance ID:  i-0c91b7f86b3556a8b
+Public IP:    54.147.11.100
+Instance Type: t3.micro (2 vCPU, 1 GB RAM)
+OS:           Ubuntu 24.04 LTS
+Region:       us-east-1 (N. Virginia)
+Key Pair:     first.pem
+```
+
+**Quick Deploy:**
+```bash
+# SSH into server
+ssh -i "first.pem" ubuntu@54.147.11.100
+
+# Pull latest & restart
+cd ~/mini-RAG
+git pull origin main
+docker compose up -d --build
+```
+
+**Live URLs:**
+- Frontend: http://54.147.11.100:5173
+- Backend API: http://54.147.11.100:8001
+- API Docs: http://54.147.11.100:8001/docs
+
+📖 **[Full AWS Setup Guide →](AWS_SETUP_GUIDE.md)**
+
+---
 
 ### Backend (Render)
 1. Connect GitHub repo to Render
