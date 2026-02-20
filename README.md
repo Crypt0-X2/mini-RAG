@@ -285,35 +285,38 @@ See [evaluation.md](evaluation.md) for detailed results.
 
 ## 🚢 Deployment
 
-### ☁️ AWS EC2 (Docker) — Current Production
+### ☁️ AWS EC2 (Docker) — Live Deployment
 
-**Instance Details:**
-```
-Instance ID:  i-0c91b7f86b3556a8b
-Public IP:    54.147.11.100
-Instance Type: t3.micro (2 vCPU, 1 GB RAM)
-OS:           Ubuntu 24.04 LTS
-Region:       us-east-1 (N. Virginia)
-Key Pair:     first.pem
-```
-
-**Quick Deploy:**
-```bash
-# SSH into server
-ssh -i "first.pem" ubuntu@54.147.11.100
-
-# Pull latest & restart
-cd ~/mini-RAG
-git pull origin main
-docker compose up -d --build
-```
+The app is live and hosted on AWS EC2 (Ubuntu 24.04, t3.micro, us-east-1):
 
 **Live URLs:**
-- Frontend: http://54.147.11.100:5173
-- Backend API: http://54.147.11.100:8001
-- API Docs: http://54.147.11.100:8001/docs
+- 🌐 Frontend: http://54.147.11.100:5173
+- ⚙️ Backend API: http://54.147.11.100:8001
+- 📖 API Docs: http://54.147.11.100:8001/docs
 
-📖 **[Full AWS Setup Guide →](AWS_SETUP_GUIDE.md)**
+> Hosted on EC2 instance `ec2-54-147-11-100.compute-1.amazonaws.com` — verify with a reverse DNS lookup.
+
+---
+
+### 🖥️ Self-Host on Your Own Server
+
+To deploy on your own machine or cloud server:
+
+```bash
+git clone https://github.com/Crypt0-X2/mini-RAG
+cd mini-RAG
+
+# Add your API keys
+cp .env.docker .env
+nano .env  # fill in JINA_API_KEY, PINECONE_API_KEY, GROQ_API_KEY
+
+# Run with Docker
+docker compose up -d --build
+
+# Access at:
+# Frontend: http://localhost:5173
+# Backend:  http://localhost:8001/docs
+```
 
 ---
 
